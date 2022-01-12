@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <title>🍌 Data banana - DBT - Generate doc in one static HTML file</title>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="🍌 Data banana Full Atom Feed" />
+        <link href="/feeds/misc.atom.xml" type="application/atom+xml" rel="alternate" title="🍌 Data banana Categories Atom Feed" />
+
+
+
+
+    <meta name="tags" content="python" />
+    <meta name="tags" content="dbt" />
+
+        <link rel="stylesheet" href="/theme/css/main.css">
+        <link rel="stylesheet" href="/theme/css/ipython.css">
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">🍌 Data banana</a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+        </ul></nav><!-- /#menu -->
+<section id="content" class="body"><!--
+--><header><!--
+    --><h2 class="entry-title">
+      <a href="/dbt-generate-doc-in-one-static-html-file.html" rel="bookmark"
+         title="Permalink to DBT - Generate doc in one static HTML file">DBT - Generate doc in one static HTML file</a></h2>
+ 
+  </header>
+  <div class="entry-content">
+    
+
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p><strong>Problematic:</strong></p>
+<p>DBT tool generates static documentation in several files (<code>index.html</code>, <code>catalog.json</code>, <code>manifest.json</code>). 
+Without a web server, is not possible to read or share this documentation.</p>
+<ul>
+<li>In local, CORS security is enabled (<a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">https://en.wikipedia.org/wiki/Cross-origin_resource_sharing</a>)</li>
+<li>In some cloud storage (like Google Cloud Storage), it's only possible to share a single static page </li>
+</ul>
+<p><strong>Solution:</strong></p>
+<p>Update the javascript code inside the <code>index.html</code>. 
+Put the content of the json files directly in this file and remove network loading.</p>
+<p><strong>Other information:</strong></p>
+<p>Test with <code>dbt==1.0.0</code> and <code>dbt==0.20.2</code></p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">PATH_DBT_PROJECT</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">search_str</span> <span class="o">=</span> <span class="s1">&#39;o=[i(&quot;manifest&quot;,&quot;manifest.json&quot;+t),i(&quot;catalog&quot;,&quot;catalog.json&quot;+t)]&#39;</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_DBT_PROJECT</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">content_index</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_DBT_PROJECT</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;manifest.json&#39;</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">json_manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+<span class="c1"># In the static website there are 2 more projects inside the documentation: dbt and dbt_bigquery </span>
+<span class="c1"># This is technical information that we don&#39;t want to provide to our final users, so we drop it</span>
+<span class="c1"># Note: depends of the connector, here we use BigQuery </span>
+<span class="n">IGNORE_PROJECTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dbt&#39;</span><span class="p">,</span> <span class="s1">&#39;dbt_bigquery&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">element_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;nodes&#39;</span><span class="p">,</span> <span class="s1">&#39;sources&#39;</span><span class="p">,</span> <span class="s1">&#39;macros&#39;</span><span class="p">,</span> <span class="s1">&#39;parent_map&#39;</span><span class="p">,</span> <span class="s1">&#39;child_map&#39;</span><span class="p">]:</span>  <span class="c1"># navigate into manifest</span>
+    <span class="c1"># We transform to list to not change dict size during iteration, we use default value {} to handle KeyError</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">json_manifest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">element_type</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>  
+        <span class="k">for</span> <span class="n">ignore_project</span> <span class="ow">in</span> <span class="n">IGNORE_PROJECTS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">fr</span><span class="s1">&#39;^.*\.</span><span class="si">{</span><span class="n">ignore_project</span><span class="si">}</span><span class="s1">\.&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>  <span class="c1"># match with string that start with &#39;*.&lt;ignore_project&gt;.&#39;</span>
+                <span class="k">del</span> <span class="n">json_manifest</span><span class="p">[</span><span class="n">element_type</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>  <span class="c1"># delete element</span>
+    
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_DBT_PROJECT</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;catalog.json&#39;</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">json_catalog</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_DBT_PROJECT</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;index2.html&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">new_str</span> <span class="o">=</span> <span class="s2">&quot;o=[{label: &#39;manifest&#39;, data: &quot;</span><span class="o">+</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_manifest</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;},{label: &#39;catalog&#39;, data: &quot;</span><span class="o">+</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_catalog</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;}]&quot;</span>
+    <span class="n">new_content</span> <span class="o">=</span> <span class="n">content_index</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">search_str</span><span class="p">,</span> <span class="n">new_str</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_content</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p><strong>Understand the javascript code:</strong></p>
+<p>If we search the string "manifest.json" or "catalog.json" in the HTML file, we find the function <code>loadProject()</code>.
+This is the place where are loaded the data.</p>
+<div class="highlight"><pre><span></span><span class="nx">n</span><span class="p">.</span><span class="nx">loadProject</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">t</span> <span class="o">=</span> <span class="s2">&quot;?cb=&quot;</span> <span class="o">+</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">(),</span>
+        <span class="nx">o</span> <span class="o">=</span> <span class="p">[</span><span class="nx">i</span><span class="p">(</span><span class="s2">&quot;manifest&quot;</span><span class="p">,</span> <span class="s2">&quot;manifest.json&quot;</span> <span class="o">+</span> <span class="nx">t</span><span class="p">),</span> <span class="nx">i</span><span class="p">(</span><span class="s2">&quot;catalog&quot;</span><span class="p">,</span> <span class="s2">&quot;catalog.json&quot;</span> <span class="o">+</span> <span class="nx">t</span><span class="p">)];</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+<p>If we check the <code>i()</code> function that confirm that.</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">i</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">t</span><span class="p">({</span>
+        <span class="nx">method</span><span class="o">:</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+        <span class="nx">url</span><span class="o">:</span> <span class="nx">n</span>
+    <span class="p">}).</span><span class="nx">then</span><span class="p">((</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">label</span><span class="o">:</span> <span class="nx">e</span><span class="p">,</span>
+        <span class="nx">data</span><span class="o">:</span> <span class="nx">t</span><span class="p">.</span><span class="nx">data</span>
+        <span class="p">}</span>
+    <span class="p">}),</span> <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// ...</span>
+    <span class="p">}))</span>
+<span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+
+  </div><!-- /.entry-content -->
+  <footer class="post-info">
+    <time class="published" datetime="2022-01-01T00:00:00+01:00">
+      2022-01-01
+    </time>
+    <address class="vcard author">
+      By           <a class="url fn" href="/author/data-banana.html">Data Banana</a>
+    </address>
+    <!-- 
+    <div class="category">
+        Category: <a href="/category/misc.html">misc</a>
+    </div>
+    -->
+    <div class="tags">
+        Tags:
+            <a href="/tag/python.html">python</a>
+            <a href="/tag/dbt.html">dbt</a>
+    </div>
+  </footer><!-- /.post-info -->
+    <div id="disqus_thread"></div>
+    <script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+        
+        var disqus_config = function () {
+         //this.page.url = 'dbt-generate-doc-in-one-static-html-file.html';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'dbt-generate-doc-in-one-static-html-file'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://data-banana.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  
+</section>
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                <br/>
+                2022 - Data engineer blog - All the content of the site is subject to the license <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA</a>
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
+</body>
+</html>
