@@ -1,5 +1,659 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>🍌 Data banana</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2022-01-01T00:00:00+01:00</updated><entry><title>DBT - Generate doc in one static HTML file</title><link href="/dbt-generate-doc-in-one-static-html-file.html" rel="alternate"></link><published>2022-01-01T00:00:00+01:00</published><updated>2022-01-01T00:00:00+01:00</updated><author><name>Data Banana</name></author><id>tag:None,2022-01-01:/dbt-generate-doc-in-one-static-html-file.html</id><summary type="html">DBT - Generate doc in one static HTML file</summary><content type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>🍌 Data banana</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2022-02-10T00:00:00+01:00</updated><entry><title>Airflow - strategy to test DAG in local</title><link href="/airflow-strategy-to-test-dag-in-local.html" rel="alternate"></link><published>2022-02-10T00:00:00+01:00</published><updated>2022-02-10T00:00:00+01:00</updated><author><name>Data Banana</name></author><id>tag:None,2022-02-10:/airflow-strategy-to-test-dag-in-local.html</id><summary type="html">Airflow - strategy to test DAG in local</summary><content type="html">
+
+&lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
+&lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
+&lt;h2 id="Problematic:"&gt;Problematic:&lt;a class="anchor-link" href="#Problematic:"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;It can be quite complicate to test an Airflow DAG in local. 
+Sometimes, you don't want to run the full DAG, but just some tasks.&lt;/p&gt;
+&lt;h2 id="Solution:"&gt;Solution:&lt;a class="anchor-link" href="#Solution:"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;To solve this problem, we created a test function to run only some task of a DAG.&lt;/p&gt;
+&lt;p&gt;We also made a project with an exemple: &lt;a href="https://github.com/data-banana/example_airflow_in_local"&gt;https://github.com/data-banana/example_airflow_in_local&lt;/a&gt;&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
+&lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
+&lt;h2 id="The-test_dag-function"&gt;The test_dag function&lt;a class="anchor-link" href="#The-test_dag-function"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
+&lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
+&lt;p&gt;This is the main function to test a DAG in local and disabled some tasks.&lt;/p&gt;
+&lt;p&gt;Note: this is not a generic solution, it will depend on how you declare your tasks in your DAG&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[2]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;airflow.models.baseoperator&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;BaseOperator&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;test_dag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dag_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tasks_id_to_run&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[]):&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;do_nothing&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;do nothing&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;pass&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;recursive_disabled_tasks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tasks_id_to_run&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;)):&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;task_id&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;tasks_id_to_run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;do_nothing&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;downstream_list&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;recursive_disabled_tasks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;downstream_list&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tasks_id_to_run&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;SCRIPT_DIR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dirname&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;realpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="vm"&gt;__file__&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="c1"&gt;# Add path where are located DAGs, depend on your project ...&lt;/span&gt;
+    &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;normpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SCRIPT_DIR&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pardir&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;src&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+    &lt;span class="c1"&gt;# import DAG&lt;/span&gt;
+    &lt;span class="n"&gt;module&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;__import__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dag_name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="c1"&gt;# transform module object to dict, get vairables&lt;/span&gt;
+    &lt;span class="n"&gt;variables&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__getattribute__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="p"&gt;)}&lt;/span&gt;
+
+
+    &lt;span class="c1"&gt;# Get tasks from simple global variable&lt;/span&gt;
+    &lt;span class="n"&gt;tasks&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BaseOperator&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;variables&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;()))&lt;/span&gt;
+    &lt;span class="c1"&gt;# Get tasks from list of tasks in global variable&lt;/span&gt;
+    &lt;span class="n"&gt;list_var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;variables&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;()))&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;l&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;list_var&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;var&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;l&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BaseOperator&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+                &lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="c1"&gt;# TODO: complete, for exemple if you declare DAGs in other objects type, like dict&lt;/span&gt;
+    &lt;span class="c1"&gt;# ...&lt;/span&gt;
+    
+    &lt;span class="c1"&gt;# Disabled task, add dummy function&lt;/span&gt;
+    &lt;span class="n"&gt;recursive_disabled_tasks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tasks_id_to_run&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;dag&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;variables&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;dag&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="c1"&gt;# Add suffix to the dag name&lt;/span&gt;
+    &lt;span class="n"&gt;dag&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dag_id&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_test&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;dag&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
+&lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
+&lt;h2 id="Let's-try-to-explain-the-code"&gt;Let's try to explain the code&lt;a class="anchor-link" href="#Let's-try-to-explain-the-code"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
+&lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
+&lt;p&gt;First of all, we will create a stupid example of DAG.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[3]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;dag_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;tmp_dag&amp;#39;&lt;/span&gt;
+
+&lt;span class="n"&gt;content_dag&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="s2"&gt;from airflow.operators.python_operator import PythonOperator&lt;/span&gt;
+&lt;span class="s2"&gt;from airflow import DAG&lt;/span&gt;
+&lt;span class="s2"&gt;from airflow.utils.dates import days_ago&lt;/span&gt;
+
+&lt;span class="s2"&gt;default_args = {&lt;/span&gt;
+&lt;span class="s2"&gt;    &amp;quot;start_date&amp;quot;: days_ago(1),&lt;/span&gt;
+&lt;span class="s2"&gt;    &amp;quot;owner&amp;quot;: &amp;quot;Data Banana&amp;quot;,&lt;/span&gt;
+&lt;span class="s2"&gt;    &amp;#39;retries&amp;#39;: 0,&lt;/span&gt;
+&lt;span class="s2"&gt;}&lt;/span&gt;
+&lt;span class="s2"&gt;dag = DAG(&lt;/span&gt;
+&lt;span class="s2"&gt;    &amp;#39;tmp_dag&amp;#39;,&lt;/span&gt;
+&lt;span class="s2"&gt;    default_args=default_args,&lt;/span&gt;
+&lt;span class="s2"&gt;    schedule_interval=&amp;#39;1 1 * * *&amp;#39;,&lt;/span&gt;
+&lt;span class="s2"&gt;    description=&amp;#39;Stupid DAG&amp;#39;&lt;/span&gt;
+&lt;span class="s2"&gt;)&lt;/span&gt;
+
+&lt;span class="s2"&gt;def do_something(**kwargs):&lt;/span&gt;
+&lt;span class="s2"&gt;    print(&amp;quot;do something&amp;quot;)&lt;/span&gt;
+
+&lt;span class="s2"&gt;t1 = PythonOperator(&lt;/span&gt;
+&lt;span class="s2"&gt;    task_id=&amp;#39;task1&amp;#39;,&lt;/span&gt;
+&lt;span class="s2"&gt;    python_callable=do_something,&lt;/span&gt;
+&lt;span class="s2"&gt;    dag=dag,&lt;/span&gt;
+&lt;span class="s2"&gt;)&lt;/span&gt;
+&lt;span class="s2"&gt;t2 = PythonOperator(&lt;/span&gt;
+&lt;span class="s2"&gt;    task_id=&amp;#39;task2&amp;#39;,&lt;/span&gt;
+&lt;span class="s2"&gt;    python_callable=do_something,&lt;/span&gt;
+&lt;span class="s2"&gt;    dag=dag,&lt;/span&gt;
+&lt;span class="s2"&gt;)&lt;/span&gt;
+&lt;span class="s2"&gt;t3 = PythonOperator(&lt;/span&gt;
+&lt;span class="s2"&gt;    task_id=&amp;#39;task3&amp;#39;,&lt;/span&gt;
+&lt;span class="s2"&gt;    python_callable=do_something,&lt;/span&gt;
+&lt;span class="s2"&gt;    dag=dag,&lt;/span&gt;
+&lt;span class="s2"&gt;)&lt;/span&gt;
+
+&lt;span class="s2"&gt;list_task = [PythonOperator(&lt;/span&gt;
+&lt;span class="s2"&gt;    task_id=&amp;#39;task4&amp;#39;,&lt;/span&gt;
+&lt;span class="s2"&gt;    python_callable=do_something,&lt;/span&gt;
+&lt;span class="s2"&gt;    dag=dag,&lt;/span&gt;
+&lt;span class="s2"&gt;)]&lt;/span&gt;
+
+&lt;span class="s2"&gt;t1 &amp;gt;&amp;gt; t2 &amp;gt;&amp;gt; t3&lt;/span&gt;
+&lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;tmp_dag.py&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;w&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_dag&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
+&lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
+&lt;p&gt;We load the DAG as a module, to access the variables&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell   "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[4]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# We add the current directory in the sys.path, so we can load the DAG as a module&lt;/span&gt;
+&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;.&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# import the DAG asa module&lt;/span&gt;
+&lt;span class="n"&gt;module&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;__import__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dag_name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# transform module object to dict, get vairables&lt;/span&gt;
+&lt;span class="n"&gt;variables&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__getattribute__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;module&lt;/span&gt;&lt;span class="p"&gt;)}&lt;/span&gt;
+&lt;span class="c1"&gt;# Now we have all variables available in this module&lt;/span&gt;
+&lt;span class="n"&gt;variables&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="jp-Cell-outputWrapper"&gt;
+
+
+&lt;div class="jp-OutputArea jp-Cell-outputArea"&gt;
+
+&lt;div class="jp-OutputArea-child"&gt;
+
+    
+    &lt;div class="jp-OutputPrompt jp-OutputArea-prompt"&gt;Out[4]:&lt;/div&gt;
+
+
+
+
+&lt;div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain"&gt;
+&lt;pre&gt;{&amp;#39;DAG&amp;#39;: airflow.models.dag.DAG,
+ &amp;#39;PythonOperator&amp;#39;: airflow.operators.python.PythonOperator,
+ &amp;#39;__builtins__&amp;#39;: {&amp;#39;__name__&amp;#39;: &amp;#39;builtins&amp;#39;,
+  &amp;#39;__doc__&amp;#39;: &amp;#34;Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil&amp;#39; object; Ellipsis represents `...&amp;#39; in slices.&amp;#34;,
+  &amp;#39;__package__&amp;#39;: &amp;#39;&amp;#39;,
+  &amp;#39;__loader__&amp;#39;: _frozen_importlib.BuiltinImporter,
+  &amp;#39;__spec__&amp;#39;: ModuleSpec(name=&amp;#39;builtins&amp;#39;, loader=&amp;lt;class &amp;#39;_frozen_importlib.BuiltinImporter&amp;#39;&amp;gt;, origin=&amp;#39;built-in&amp;#39;),
+  &amp;#39;__build_class__&amp;#39;: &amp;lt;function __build_class__&amp;gt;,
+  &amp;#39;__import__&amp;#39;: &amp;lt;function __import__&amp;gt;,
+  &amp;#39;abs&amp;#39;: &amp;lt;function abs(x, /)&amp;gt;,
+  &amp;#39;all&amp;#39;: &amp;lt;function all(iterable, /)&amp;gt;,
+  &amp;#39;any&amp;#39;: &amp;lt;function any(iterable, /)&amp;gt;,
+  &amp;#39;ascii&amp;#39;: &amp;lt;function ascii(obj, /)&amp;gt;,
+  &amp;#39;bin&amp;#39;: &amp;lt;function bin(number, /)&amp;gt;,
+  &amp;#39;breakpoint&amp;#39;: &amp;lt;function breakpoint&amp;gt;,
+  &amp;#39;callable&amp;#39;: &amp;lt;function callable(obj, /)&amp;gt;,
+  &amp;#39;chr&amp;#39;: &amp;lt;function chr(i, /)&amp;gt;,
+  &amp;#39;compile&amp;#39;: &amp;lt;function compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1, *, _feature_version=-1)&amp;gt;,
+  &amp;#39;delattr&amp;#39;: &amp;lt;function delattr(obj, name, /)&amp;gt;,
+  &amp;#39;dir&amp;#39;: &amp;lt;function dir&amp;gt;,
+  &amp;#39;divmod&amp;#39;: &amp;lt;function divmod(x, y, /)&amp;gt;,
+  &amp;#39;eval&amp;#39;: &amp;lt;function eval(source, globals=None, locals=None, /)&amp;gt;,
+  &amp;#39;exec&amp;#39;: &amp;lt;function exec(source, globals=None, locals=None, /)&amp;gt;,
+  &amp;#39;format&amp;#39;: &amp;lt;function format(value, format_spec=&amp;#39;&amp;#39;, /)&amp;gt;,
+  &amp;#39;getattr&amp;#39;: &amp;lt;function getattr&amp;gt;,
+  &amp;#39;globals&amp;#39;: &amp;lt;function globals()&amp;gt;,
+  &amp;#39;hasattr&amp;#39;: &amp;lt;function hasattr(obj, name, /)&amp;gt;,
+  &amp;#39;hash&amp;#39;: &amp;lt;function hash(obj, /)&amp;gt;,
+  &amp;#39;hex&amp;#39;: &amp;lt;function hex(number, /)&amp;gt;,
+  &amp;#39;id&amp;#39;: &amp;lt;function id(obj, /)&amp;gt;,
+  &amp;#39;input&amp;#39;: &amp;lt;bound method Kernel.raw_input of &amp;lt;ipykernel.ipkernel.IPythonKernel object at 0x7f950006d430&amp;gt;&amp;gt;,
+  &amp;#39;isinstance&amp;#39;: &amp;lt;function isinstance(obj, class_or_tuple, /)&amp;gt;,
+  &amp;#39;issubclass&amp;#39;: &amp;lt;function issubclass(cls, class_or_tuple, /)&amp;gt;,
+  &amp;#39;iter&amp;#39;: &amp;lt;function iter&amp;gt;,
+  &amp;#39;len&amp;#39;: &amp;lt;function len(obj, /)&amp;gt;,
+  &amp;#39;locals&amp;#39;: &amp;lt;function locals()&amp;gt;,
+  &amp;#39;max&amp;#39;: &amp;lt;function max&amp;gt;,
+  &amp;#39;min&amp;#39;: &amp;lt;function min&amp;gt;,
+  &amp;#39;next&amp;#39;: &amp;lt;function next&amp;gt;,
+  &amp;#39;oct&amp;#39;: &amp;lt;function oct(number, /)&amp;gt;,
+  &amp;#39;ord&amp;#39;: &amp;lt;function ord(c, /)&amp;gt;,
+  &amp;#39;pow&amp;#39;: &amp;lt;function pow(base, exp, mod=None)&amp;gt;,
+  &amp;#39;print&amp;#39;: &amp;lt;function print&amp;gt;,
+  &amp;#39;repr&amp;#39;: &amp;lt;function repr(obj, /)&amp;gt;,
+  &amp;#39;round&amp;#39;: &amp;lt;function round(number, ndigits=None)&amp;gt;,
+  &amp;#39;setattr&amp;#39;: &amp;lt;function setattr(obj, name, value, /)&amp;gt;,
+  &amp;#39;sorted&amp;#39;: &amp;lt;function sorted(iterable, /, *, key=None, reverse=False)&amp;gt;,
+  &amp;#39;sum&amp;#39;: &amp;lt;function sum(iterable, /, start=0)&amp;gt;,
+  &amp;#39;vars&amp;#39;: &amp;lt;function vars&amp;gt;,
+  &amp;#39;None&amp;#39;: None,
+  &amp;#39;Ellipsis&amp;#39;: Ellipsis,
+  &amp;#39;NotImplemented&amp;#39;: NotImplemented,
+  &amp;#39;False&amp;#39;: False,
+  &amp;#39;True&amp;#39;: True,
+  &amp;#39;bool&amp;#39;: bool,
+  &amp;#39;memoryview&amp;#39;: memoryview,
+  &amp;#39;bytearray&amp;#39;: bytearray,
+  &amp;#39;bytes&amp;#39;: bytes,
+  &amp;#39;classmethod&amp;#39;: classmethod,
+  &amp;#39;complex&amp;#39;: complex,
+  &amp;#39;dict&amp;#39;: dict,
+  &amp;#39;enumerate&amp;#39;: enumerate,
+  &amp;#39;filter&amp;#39;: filter,
+  &amp;#39;float&amp;#39;: float,
+  &amp;#39;frozenset&amp;#39;: frozenset,
+  &amp;#39;property&amp;#39;: property,
+  &amp;#39;int&amp;#39;: int,
+  &amp;#39;list&amp;#39;: list,
+  &amp;#39;map&amp;#39;: map,
+  &amp;#39;object&amp;#39;: object,
+  &amp;#39;range&amp;#39;: range,
+  &amp;#39;reversed&amp;#39;: reversed,
+  &amp;#39;set&amp;#39;: set,
+  &amp;#39;slice&amp;#39;: slice,
+  &amp;#39;staticmethod&amp;#39;: staticmethod,
+  &amp;#39;str&amp;#39;: str,
+  &amp;#39;super&amp;#39;: super,
+  &amp;#39;tuple&amp;#39;: tuple,
+  &amp;#39;type&amp;#39;: type,
+  &amp;#39;zip&amp;#39;: zip,
+  &amp;#39;__debug__&amp;#39;: True,
+  &amp;#39;BaseException&amp;#39;: BaseException,
+  &amp;#39;Exception&amp;#39;: Exception,
+  &amp;#39;TypeError&amp;#39;: TypeError,
+  &amp;#39;StopAsyncIteration&amp;#39;: StopAsyncIteration,
+  &amp;#39;StopIteration&amp;#39;: StopIteration,
+  &amp;#39;GeneratorExit&amp;#39;: GeneratorExit,
+  &amp;#39;SystemExit&amp;#39;: SystemExit,
+  &amp;#39;KeyboardInterrupt&amp;#39;: KeyboardInterrupt,
+  &amp;#39;ImportError&amp;#39;: ImportError,
+  &amp;#39;ModuleNotFoundError&amp;#39;: ModuleNotFoundError,
+  &amp;#39;OSError&amp;#39;: OSError,
+  &amp;#39;EnvironmentError&amp;#39;: OSError,
+  &amp;#39;IOError&amp;#39;: OSError,
+  &amp;#39;EOFError&amp;#39;: EOFError,
+  &amp;#39;RuntimeError&amp;#39;: RuntimeError,
+  &amp;#39;RecursionError&amp;#39;: RecursionError,
+  &amp;#39;NotImplementedError&amp;#39;: NotImplementedError,
+  &amp;#39;NameError&amp;#39;: NameError,
+  &amp;#39;UnboundLocalError&amp;#39;: UnboundLocalError,
+  &amp;#39;AttributeError&amp;#39;: AttributeError,
+  &amp;#39;SyntaxError&amp;#39;: SyntaxError,
+  &amp;#39;IndentationError&amp;#39;: IndentationError,
+  &amp;#39;TabError&amp;#39;: TabError,
+  &amp;#39;LookupError&amp;#39;: LookupError,
+  &amp;#39;IndexError&amp;#39;: IndexError,
+  &amp;#39;KeyError&amp;#39;: KeyError,
+  &amp;#39;ValueError&amp;#39;: ValueError,
+  &amp;#39;UnicodeError&amp;#39;: UnicodeError,
+  &amp;#39;UnicodeEncodeError&amp;#39;: UnicodeEncodeError,
+  &amp;#39;UnicodeDecodeError&amp;#39;: UnicodeDecodeError,
+  &amp;#39;UnicodeTranslateError&amp;#39;: UnicodeTranslateError,
+  &amp;#39;AssertionError&amp;#39;: AssertionError,
+  &amp;#39;ArithmeticError&amp;#39;: ArithmeticError,
+  &amp;#39;FloatingPointError&amp;#39;: FloatingPointError,
+  &amp;#39;OverflowError&amp;#39;: OverflowError,
+  &amp;#39;ZeroDivisionError&amp;#39;: ZeroDivisionError,
+  &amp;#39;SystemError&amp;#39;: SystemError,
+  &amp;#39;ReferenceError&amp;#39;: ReferenceError,
+  &amp;#39;MemoryError&amp;#39;: MemoryError,
+  &amp;#39;BufferError&amp;#39;: BufferError,
+  &amp;#39;Warning&amp;#39;: Warning,
+  &amp;#39;UserWarning&amp;#39;: UserWarning,
+  &amp;#39;DeprecationWarning&amp;#39;: DeprecationWarning,
+  &amp;#39;PendingDeprecationWarning&amp;#39;: PendingDeprecationWarning,
+  &amp;#39;SyntaxWarning&amp;#39;: SyntaxWarning,
+  &amp;#39;RuntimeWarning&amp;#39;: RuntimeWarning,
+  &amp;#39;FutureWarning&amp;#39;: FutureWarning,
+  &amp;#39;ImportWarning&amp;#39;: ImportWarning,
+  &amp;#39;UnicodeWarning&amp;#39;: UnicodeWarning,
+  &amp;#39;BytesWarning&amp;#39;: BytesWarning,
+  &amp;#39;ResourceWarning&amp;#39;: ResourceWarning,
+  &amp;#39;ConnectionError&amp;#39;: ConnectionError,
+  &amp;#39;BlockingIOError&amp;#39;: BlockingIOError,
+  &amp;#39;BrokenPipeError&amp;#39;: BrokenPipeError,
+  &amp;#39;ChildProcessError&amp;#39;: ChildProcessError,
+  &amp;#39;ConnectionAbortedError&amp;#39;: ConnectionAbortedError,
+  &amp;#39;ConnectionRefusedError&amp;#39;: ConnectionRefusedError,
+  &amp;#39;ConnectionResetError&amp;#39;: ConnectionResetError,
+  &amp;#39;FileExistsError&amp;#39;: FileExistsError,
+  &amp;#39;FileNotFoundError&amp;#39;: FileNotFoundError,
+  &amp;#39;IsADirectoryError&amp;#39;: IsADirectoryError,
+  &amp;#39;NotADirectoryError&amp;#39;: NotADirectoryError,
+  &amp;#39;InterruptedError&amp;#39;: InterruptedError,
+  &amp;#39;PermissionError&amp;#39;: PermissionError,
+  &amp;#39;ProcessLookupError&amp;#39;: ProcessLookupError,
+  &amp;#39;TimeoutError&amp;#39;: TimeoutError,
+  &amp;#39;open&amp;#39;: &amp;lt;function io.open(file, mode=&amp;#39;r&amp;#39;, buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)&amp;gt;,
+  &amp;#39;copyright&amp;#39;: Copyright (c) 2001-2020 Python Software Foundation.
+  All Rights Reserved.
+  
+  Copyright (c) 2000 BeOpen.com.
+  All Rights Reserved.
+  
+  Copyright (c) 1995-2001 Corporation for National Research Initiatives.
+  All Rights Reserved.
+  
+  Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+  All Rights Reserved.,
+  &amp;#39;credits&amp;#39;:     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+      for supporting Python development.  See www.python.org for more information.,
+  &amp;#39;license&amp;#39;: Type license() to see the full license text,
+  &amp;#39;help&amp;#39;: Type help() for interactive help, or help(object) for help about object.,
+  &amp;#39;__IPYTHON__&amp;#39;: True,
+  &amp;#39;display&amp;#39;: &amp;lt;function IPython.core.display.display(*objs, include=None, exclude=None, metadata=None, transient=None, display_id=None, **kwargs)&amp;gt;,
+  &amp;#39;get_ipython&amp;#39;: &amp;lt;bound method InteractiveShell.get_ipython of &amp;lt;ipykernel.zmqshell.ZMQInteractiveShell object at 0x7f950006d5b0&amp;gt;&amp;gt;},
+ &amp;#39;__doc__&amp;#39;: None,
+ &amp;#39;__name__&amp;#39;: &amp;#39;tmp_dag&amp;#39;,
+ &amp;#39;__package__&amp;#39;: &amp;#39;&amp;#39;,
+ &amp;#39;__warningregistry__&amp;#39;: {&amp;#39;version&amp;#39;: 80},
+ &amp;#39;dag&amp;#39;: &amp;lt;DAG: tmp_dag&amp;gt;,
+ &amp;#39;days_ago&amp;#39;: &amp;lt;function airflow.utils.dates.days_ago(n, hour=0, minute=0, second=0, microsecond=0)&amp;gt;,
+ &amp;#39;default_args&amp;#39;: {&amp;#39;start_date&amp;#39;: datetime.datetime(2022, 2, 9, 0, 0, tzinfo=Timezone(&amp;#39;UTC&amp;#39;)),
+  &amp;#39;owner&amp;#39;: &amp;#39;Data Banana&amp;#39;,
+  &amp;#39;retries&amp;#39;: 0},
+ &amp;#39;do_something&amp;#39;: &amp;lt;function tmp_dag.do_something(**kwargs)&amp;gt;,
+ &amp;#39;list_task&amp;#39;: [&amp;lt;Task(PythonOperator): task4&amp;gt;],
+ &amp;#39;t1&amp;#39;: &amp;lt;Task(PythonOperator): task1&amp;gt;,
+ &amp;#39;t2&amp;#39;: &amp;lt;Task(PythonOperator): task2&amp;gt;,
+ &amp;#39;t3&amp;#39;: &amp;lt;Task(PythonOperator): task3&amp;gt;}&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
+&lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
+&lt;p&gt;Now We will start to find the task object in all variables...&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell   "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[5]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Get tasks from simple variable &lt;/span&gt;
+&lt;span class="n"&gt;tasks&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BaseOperator&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;variables&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;()))&lt;/span&gt;
+&lt;span class="n"&gt;tasks&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="jp-Cell-outputWrapper"&gt;
+
+
+&lt;div class="jp-OutputArea jp-Cell-outputArea"&gt;
+
+&lt;div class="jp-OutputArea-child"&gt;
+
+    
+    &lt;div class="jp-OutputPrompt jp-OutputArea-prompt"&gt;Out[5]:&lt;/div&gt;
+
+
+
+
+&lt;div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain"&gt;
+&lt;pre&gt;[&amp;lt;Task(PythonOperator): task1&amp;gt;,
+ &amp;lt;Task(PythonOperator): task2&amp;gt;,
+ &amp;lt;Task(PythonOperator): task3&amp;gt;]&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell   "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[6]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Get tasks from list of tasks &lt;/span&gt;
+&lt;span class="n"&gt;list_var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;variables&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;()))&lt;/span&gt;
+&lt;span class="n"&gt;tasks_from_list&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;l&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;list_var&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;var&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;l&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BaseOperator&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+            &lt;span class="n"&gt;tasks_from_list&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;var&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;tasks_from_list&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="jp-Cell-outputWrapper"&gt;
+
+
+&lt;div class="jp-OutputArea jp-Cell-outputArea"&gt;
+
+&lt;div class="jp-OutputArea-child"&gt;
+
+    
+    &lt;div class="jp-OutputPrompt jp-OutputArea-prompt"&gt;Out[6]:&lt;/div&gt;
+
+
+
+
+&lt;div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain"&gt;
+&lt;pre&gt;[&amp;lt;Task(PythonOperator): task4&amp;gt;]&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[7]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# So here you may handle more scenario ...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell   "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[8]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;all_tasks&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;tasks&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;tasks_from_list&lt;/span&gt;
+&lt;span class="n"&gt;all_tasks&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="jp-Cell-outputWrapper"&gt;
+
+
+&lt;div class="jp-OutputArea jp-Cell-outputArea"&gt;
+
+&lt;div class="jp-OutputArea-child"&gt;
+
+    
+    &lt;div class="jp-OutputPrompt jp-OutputArea-prompt"&gt;Out[8]:&lt;/div&gt;
+
+
+
+
+&lt;div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain"&gt;
+&lt;pre&gt;[&amp;lt;Task(PythonOperator): task1&amp;gt;,
+ &amp;lt;Task(PythonOperator): task2&amp;gt;,
+ &amp;lt;Task(PythonOperator): task3&amp;gt;,
+ &amp;lt;Task(PythonOperator): task4&amp;gt;]&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell   "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[9]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;task&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;all_tasks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;task&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="jp-Cell-outputWrapper"&gt;
+
+
+&lt;div class="jp-OutputArea jp-Cell-outputArea"&gt;
+
+&lt;div class="jp-OutputArea-child"&gt;
+
+    
+    &lt;div class="jp-OutputPrompt jp-OutputArea-prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain"&gt;
+&lt;pre&gt;&amp;lt;bound method PythonOperator.execute of &amp;lt;Task(PythonOperator): task1&amp;gt;&amp;gt;
+&amp;lt;bound method PythonOperator.execute of &amp;lt;Task(PythonOperator): task2&amp;gt;&amp;gt;
+&amp;lt;bound method PythonOperator.execute of &amp;lt;Task(PythonOperator): task3&amp;gt;&amp;gt;
+&amp;lt;bound method PythonOperator.execute of &amp;lt;Task(PythonOperator): task4&amp;gt;&amp;gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
+&lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
+&lt;p&gt;Now we want to change the behaviour of those tasks, and also navigate on the task downstream list to be sure we didn't forget some tasks&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[10]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;do_nothing&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;do nothing&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;recursive_disabled_tasks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tasks_id_to_run&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[]):&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;)):&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;task_id&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;tasks_id_to_run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;do_nothing&lt;/span&gt;
+        &lt;span class="c1"&gt;# Navigate in downstream_list to check if we didn&amp;#39;t &lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;downstream_list&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;recursive_disabled_tasks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;downstream_list&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tasks_id_to_run&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;recursive_disabled_tasks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;all_tasks&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;task4&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell   "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[11]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;task&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;all_tasks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;task&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="jp-Cell-outputWrapper"&gt;
+
+
+&lt;div class="jp-OutputArea jp-Cell-outputArea"&gt;
+
+&lt;div class="jp-OutputArea-child"&gt;
+
+    
+    &lt;div class="jp-OutputPrompt jp-OutputArea-prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain"&gt;
+&lt;pre&gt;&amp;lt;function do_nothing at 0x7f94f0199550&amp;gt;
+&amp;lt;function do_nothing at 0x7f94f0199550&amp;gt;
+&amp;lt;function do_nothing at 0x7f94f0199550&amp;gt;
+&amp;lt;bound method PythonOperator.execute of &amp;lt;Task(PythonOperator): task4&amp;gt;&amp;gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;&lt;div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  "&gt;
+&lt;div class="jp-Cell-inputWrapper"&gt;
+&lt;div class="jp-InputArea jp-Cell-inputArea"&gt;
+&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;In&amp;nbsp;[12]:&lt;/div&gt;
+&lt;div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline"&gt;
+     &lt;div class="CodeMirror cm-s-jupyter"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Let&amp;#39;s just rename the DAG&lt;/span&gt;
+&lt;span class="n"&gt;dag&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;variables&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;dag&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;dag&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dag_id&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_test&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+     &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+</content><category term="misc"></category><category term="python"></category><category term="airflow"></category></entry><entry><title>DBT - Generate doc in one static HTML file</title><link href="/dbt-generate-doc-in-one-static-html-file.html" rel="alternate"></link><published>2022-01-01T00:00:00+01:00</published><updated>2022-01-01T00:00:00+01:00</updated><author><name>Data Banana</name></author><id>tag:None,2022-01-01:/dbt-generate-doc-in-one-static-html-file.html</id><summary type="html">DBT - Generate doc in one static HTML file</summary><content type="html">
 
 &lt;div class="jp-Cell-inputWrapper"&gt;&lt;div class="jp-InputPrompt jp-InputArea-prompt"&gt;
 &lt;/div&gt;&lt;div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown"&gt;
